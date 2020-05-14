@@ -57,6 +57,10 @@ sed -i -E "s/is_writable\('\.\/config.*?'\)/true/g" \
 find . -type f -exec chmod a-x \{\} \;
 chmod -R g-w,o-w .
 
+# Delete contents of cache and upload directories
+#
+rm -rf cache/* upload/*
+
 # Construct httpd drop-in configuration file
 #
 cat > %{name}.conf <<EOF
@@ -108,35 +112,20 @@ EOF
 
 # Install source files
 #
-mkdir -p %{buildroot}%{_datadir}/%{name}
-cp -a * %{buildroot}%{_datadir}/%{name}/
+mkdir -p %{buildroot}%{_localstatedir}/www/%{name}
+cp -a * %{buildroot}%{_localstatedir}/www/%{name}
 
 # Remove non-source files
 #
-rm %{buildroot}%{_datadir}/%{name}/*.conf
-rm %{buildroot}%{_datadir}/%{name}/*.json
-rm %{buildroot}%{_datadir}/%{name}/*.lock
-rm %{buildroot}%{_datadir}/%{name}/*.md5
-rm %{buildroot}%{_datadir}/%{name}/*.xml
-rm %{buildroot}%{_datadir}/%{name}/user.ini
-rm %{buildroot}%{_datadir}/%{name}/LICENSE.txt
-rm %{buildroot}%{_datadir}/%{name}/README.md
-rm %{buildroot}%{_datadir}/%{name}/%{name}-scheduler.*
-
-# Create www directory and symlinks
-#
-mkdir -p %{buildroot}%{_localstatedir}/www/%{name}
-for link in Api ModuleInstall XTemplate Zend custom data include install \
-		jssource lib metadata modules service soap themes vendor \
-		robots.txt *.html *.php ; do
-    ln -r -s %{buildroot}%{_datadir}/%{name}/${link} \
-       %{buildroot}%{_localstatedir}/www/%{name}/${link}
-done
-
-# Create writable directories
-#
-mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/cache
-mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/upload
+rm %{buildroot}%{_localstatedir}/www/%{name}/*.conf
+rm %{buildroot}%{_localstatedir}/www/%{name}/*.json
+rm %{buildroot}%{_localstatedir}/www/%{name}/*.lock
+rm %{buildroot}%{_localstatedir}/www/%{name}/*.md5
+rm %{buildroot}%{_localstatedir}/www/%{name}/*.xml
+rm %{buildroot}%{_localstatedir}/www/%{name}/user.ini
+rm %{buildroot}%{_localstatedir}/www/%{name}/LICENSE.txt
+rm %{buildroot}%{_localstatedir}/www/%{name}/README.md
+rm %{buildroot}%{_localstatedir}/www/%{name}/%{name}-scheduler.*
 
 # Install httpd drop-in configuration file
 #
@@ -182,7 +171,6 @@ install -m 644 %{name}-scheduler.timer %{buildroot}%{_unitdir}/
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 %{_unitdir}/%{name}-scheduler.service
 %{_unitdir}/%{name}-scheduler.timer
-%{_datadir}/%{name}
 %dir %{_localstatedir}/www/%{name}
 %{_localstatedir}/www/%{name}/.user.ini
 %{_localstatedir}/www/%{name}/Api
