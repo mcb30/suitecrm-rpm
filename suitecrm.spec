@@ -17,6 +17,7 @@ BuildRequires:	findutils
 BuildRequires:	sed
 BuildRequires:	systemd
 Requires:	httpd-filesystem
+Requires:	nginx-filesystem
 Requires:	php-cli
 Requires:	php-curl
 Requires:	php-fpm
@@ -78,8 +79,13 @@ rm %{buildroot}%{_datadir}/%{name}/*.json
 rm %{buildroot}%{_datadir}/%{name}/*.lock
 rm %{buildroot}%{_datadir}/%{name}/*.md5
 rm %{buildroot}%{_datadir}/%{name}/*.xml
-rm %{buildroot}%{_datadir}/%{name}/LICENSE.txt
 rm %{buildroot}%{_datadir}/%{name}/README.md
+
+# Replace LICENSE.txt with a symlink
+#
+rm %{buildroot}%{_datadir}/%{name}/LICENSE.txt
+ln -r -s %{buildroot}%{_defaultlicensedir}/%{name}/LICENSE.txt \
+   %{buildroot}%{_datadir}/%{name}/LICENSE.txt
 
 # Install package files
 #
@@ -91,24 +97,17 @@ install -D -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/httpd/conf.d/%{name}.con
 install -D -m 644 %{SOURCE6} %{buildroot}%{_datadir}/%{name}/prepend.php
 install -D -m 644 %{SOURCE7} %{buildroot}%{_sysconfdir}/%{name}/config.php
 
-# Create www directory and symlinks for SuiteCRM files
+# Create www directory and symlinks
 #
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}
-for link in Api ModuleInstall XTemplate Zend custom data include install \
-		jssource lib metadata modules service soap themes vendor \
-		robots.txt *.html *.php ; do
+mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/cache
+mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/upload
+for link in include modules themes ; do
     ln -r -s %{buildroot}%{_datadir}/%{name}/${link} \
        %{buildroot}%{_localstatedir}/www/%{name}/${link}
 done
-
-# Create symlinks for package files
-#
-ln -r -s %{buildroot}%{_defaultlicensedir}/%{name}/LICENSE.txt \
-   %{buildroot}%{_localstatedir}/www/%{name}/LICENSE.txt
 ln -r -s %{buildroot}%{_sysconfdir}/%{name}/config.php \
    %{buildroot}%{_localstatedir}/www/%{name}/config.php
-ln -r -s %{buildroot}%{_datadir}/%{name}/prepend.php \
-   %{buildroot}%{_localstatedir}/www/%{name}/prepend.php
 
 # Create writable directories
 #
@@ -116,8 +115,6 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/%{name}
 mkdir -p %{buildroot}%{_localstatedir}/lib/%{name}/session
 mkdir -p %{buildroot}%{_localstatedir}/lib/%{name}/wsdlcache
 mkdir -p %{buildroot}%{_localstatedir}/log/%{name}
-mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/cache
-mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/upload
 
 %pre
 %sysusers_create_package %{name} %{SOURCE1}
@@ -149,25 +146,10 @@ mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/upload
 %ghost %{_localstatedir}/log/%{name}/error.log
 %ghost %{_localstatedir}/log/%{name}/slow.log
 %dir %{_localstatedir}/www/%{name}
-%{_localstatedir}/www/%{name}/Api
-%{_localstatedir}/www/%{name}/ModuleInstall
-%{_localstatedir}/www/%{name}/XTemplate
-%{_localstatedir}/www/%{name}/Zend
-%{_localstatedir}/www/%{name}/custom
-%{_localstatedir}/www/%{name}/data
 %{_localstatedir}/www/%{name}/include
-%{_localstatedir}/www/%{name}/install
-%{_localstatedir}/www/%{name}/jssource
-%{_localstatedir}/www/%{name}/lib
-%{_localstatedir}/www/%{name}/metadata
 %{_localstatedir}/www/%{name}/modules
-%{_localstatedir}/www/%{name}/service
-%{_localstatedir}/www/%{name}/soap
 %{_localstatedir}/www/%{name}/themes
-%{_localstatedir}/www/%{name}/vendor
-%{_localstatedir}/www/%{name}/*.txt
-%{_localstatedir}/www/%{name}/*.html
-%{_localstatedir}/www/%{name}/*.php
+%{_localstatedir}/www/%{name}/config.php
 %attr(0775, root, %{name}) %{_localstatedir}/www/%{name}/cache
 %attr(0775, root, %{name}) %{_localstatedir}/www/%{name}/upload
 
