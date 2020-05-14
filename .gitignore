@@ -1,0 +1,5 @@
+*.log
+*.zip
+*.rpm
+noarch/
+SuiteCRM-*

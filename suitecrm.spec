@@ -5,6 +5,13 @@ Summary:	SuiteCRM Customer Relationship Management
 License:	Affero GPLv3
 URL:		https://suitecrm.com/
 Source0:	https://suitecrm.com/files/162/SuiteCRM-7.11/500/SuiteCRM-%{version}.zip
+Source1:	%{name}-sysusers.conf
+Source2:	%{name}-scheduler.service
+Source3:	%{name}-scheduler.timer
+Source4:	%{name}-fpm.conf
+Source5:	%{name}-httpd.conf
+Source6:	%{name}-prepend.php
+Source7:	%{name}-config.php
 BuildArch:	noarch
 BuildRequires:	findutils
 BuildRequires:	sed
@@ -12,6 +19,7 @@ BuildRequires:	systemd
 Requires:	httpd-filesystem
 Requires:	php-cli
 Requires:	php-curl
+Requires:	php-fpm
 Requires:	php-gd
 Requires:	php-imap
 Requires:	php-json
@@ -57,101 +65,62 @@ sed -i -E "s/is_writable\('\.\/config.*?'\)/true/g" \
 find . -type f -exec chmod a-x \{\} \;
 chmod -R g-w,o-w .
 
-# Delete contents of cache and upload directories
-#
-rm -rf cache/* upload/*
-
-# Construct httpd drop-in configuration file
-#
-cat > %{name}.conf <<EOF
-Alias /suitecrm %{_localstatedir}/www/%{name}
-
-<Directory %{_localstatedir}/www/%{name}>
-    AllowOverride None
-    Options -MultiViews +FollowSymlinks -Indexes
-    DirectoryIndex index.php
-    Require all granted
-</Directory>
-EOF
-
-# Construct .user.ini file
-#
-cat > user.ini <<EOF
-upload_max_filesize = 128M
-EOF
-
-# Construct systemd service and timer for SuiteCRM scheduler
-#
-cat > %{name}-scheduler.service <<EOF
-[Unit]
-Description=Run SuiteCRM scheduler
-
-[Service]
-Type=oneshot
-User=apache
-Group=apache
-WorkingDirectory=%{_localstatedir}/www/%{name}
-ExecStart=/usr/bin/php -f cron.php
-
-[Install]
-WantedBy=multi-user.target
-EOF
-cat > %{name}-scheduler.timer <<EOF
-[Unit]
-Description=Run SuiteCRM scheduler
-
-[Timer]
-OnUnitInactiveSec=1min
-Unit=%{name}-scheduler.service
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
 %install
 
-# Install source files
+# Install SuiteCRM files
+#
+mkdir -p %{buildroot}%{_datadir}/%{name}
+cp -a * %{buildroot}%{_datadir}/%{name}/
+
+# Remove unwanted SuiteCRM files
+#
+rm %{buildroot}%{_datadir}/%{name}/*.json
+rm %{buildroot}%{_datadir}/%{name}/*.lock
+rm %{buildroot}%{_datadir}/%{name}/*.md5
+rm %{buildroot}%{_datadir}/%{name}/*.xml
+rm %{buildroot}%{_datadir}/%{name}/LICENSE.txt
+rm %{buildroot}%{_datadir}/%{name}/README.md
+
+# Install package files
+#
+install -D -m 644 %{SOURCE1} %{buildroot}%{_sysusersdir}/%{name}.conf
+install -D -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/%{name}-scheduler.service
+install -D -m 644 %{SOURCE3} %{buildroot}%{_unitdir}/%{name}-scheduler.timer
+install -D -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/php-fpm.d/%{name}.conf
+install -D -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/httpd/conf.d/%{name}.conf
+install -D -m 644 %{SOURCE6} %{buildroot}%{_datadir}/%{name}/prepend.php
+install -D -m 644 %{SOURCE7} %{buildroot}%{_sysconfdir}/%{name}/config.php
+
+# Create www directory and symlinks for SuiteCRM files
 #
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}
-cp -a * %{buildroot}%{_localstatedir}/www/%{name}
+for link in Api ModuleInstall XTemplate Zend custom data include install \
+		jssource lib metadata modules service soap themes vendor \
+		robots.txt *.html *.php ; do
+    ln -r -s %{buildroot}%{_datadir}/%{name}/${link} \
+       %{buildroot}%{_localstatedir}/www/%{name}/${link}
+done
 
-# Remove non-source files
-#
-rm %{buildroot}%{_localstatedir}/www/%{name}/*.conf
-rm %{buildroot}%{_localstatedir}/www/%{name}/*.json
-rm %{buildroot}%{_localstatedir}/www/%{name}/*.lock
-rm %{buildroot}%{_localstatedir}/www/%{name}/*.md5
-rm %{buildroot}%{_localstatedir}/www/%{name}/*.xml
-rm %{buildroot}%{_localstatedir}/www/%{name}/user.ini
-rm %{buildroot}%{_localstatedir}/www/%{name}/LICENSE.txt
-rm %{buildroot}%{_localstatedir}/www/%{name}/README.md
-rm %{buildroot}%{_localstatedir}/www/%{name}/%{name}-scheduler.*
-
-# Install httpd drop-in configuration file
-#
-mkdir -p %{buildroot}%{_sysconfdir}/httpd/conf.d
-install -m 644 %{name}.conf %{buildroot}%{_sysconfdir}/httpd/conf.d/
-
-# Install .user.ini and config.php
-#
-mkdir -p %{buildroot}%{_sysconfdir}/%{name}
-install -m 644 user.ini %{buildroot}%{_sysconfdir}/%{name}/
-ln -r -s %{buildroot}%{_sysconfdir}/%{name}/user.ini \
-   %{buildroot}%{_localstatedir}/www/%{name}/.user.ini
-touch %{buildroot}%{_sysconfdir}/%{name}/config.php
-ln -r -s %{buildroot}%{_sysconfdir}/%{name}/config.php \
-   %{buildroot}%{_localstatedir}/www/%{name}/config.php
-
-# Symlink to LICENSE.txt
+# Create symlinks for package files
 #
 ln -r -s %{buildroot}%{_defaultlicensedir}/%{name}/LICENSE.txt \
    %{buildroot}%{_localstatedir}/www/%{name}/LICENSE.txt
+ln -r -s %{buildroot}%{_sysconfdir}/%{name}/config.php \
+   %{buildroot}%{_localstatedir}/www/%{name}/config.php
+ln -r -s %{buildroot}%{_datadir}/%{name}/prepend.php \
+   %{buildroot}%{_localstatedir}/www/%{name}/prepend.php
 
-# Install systemd unit files
+# Create writable directories
 #
-mkdir -p %{buildroot}%{_unitdir}
-install -m 644 %{name}-scheduler.service %{buildroot}%{_unitdir}/
-install -m 644 %{name}-scheduler.timer %{buildroot}%{_unitdir}/
+mkdir -p %{buildroot}%{_localstatedir}/lib/%{name}
+mkdir -p %{buildroot}%{_localstatedir}/lib/%{name}/session
+mkdir -p %{buildroot}%{_localstatedir}/lib/%{name}/wsdlcache
+mkdir -p %{buildroot}%{_localstatedir}/log/%{name}
+mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/cache
+mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/upload
+
+%pre
+%sysusers_create_package %{name} %{SOURCE1}
 
 %post
 %systemd_post %{name}-scheduler.service
@@ -166,13 +135,20 @@ install -m 644 %{name}-scheduler.timer %{buildroot}%{_unitdir}/
 %doc README.md
 %license LICENSE.txt
 %dir %{_sysconfdir}/%{name}
-%config(noreplace) %{_sysconfdir}/%{name}/user.ini
 %config(noreplace) %{_sysconfdir}/%{name}/config.php
+%config(noreplace) %{_sysconfdir}/php-fpm.d/%{name}.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
+%{_sysusersdir}/%{name}.conf
 %{_unitdir}/%{name}-scheduler.service
 %{_unitdir}/%{name}-scheduler.timer
+%{_datadir}/%{name}
+%attr(0775, root, %{name}) %dir %{_localstatedir}/lib/%{name}
+%attr(0775, root, %{name}) %dir %{_localstatedir}/lib/%{name}/session
+%attr(0775, root, %{name}) %dir %{_localstatedir}/lib/%{name}/wsdlcache
+%attr(0775, root, %{name}) %dir %{_localstatedir}/log/%{name}
+%ghost %{_localstatedir}/log/%{name}/error.log
+%ghost %{_localstatedir}/log/%{name}/slow.log
 %dir %{_localstatedir}/www/%{name}
-%{_localstatedir}/www/%{name}/.user.ini
 %{_localstatedir}/www/%{name}/Api
 %{_localstatedir}/www/%{name}/ModuleInstall
 %{_localstatedir}/www/%{name}/XTemplate
@@ -192,7 +168,7 @@ install -m 644 %{name}-scheduler.timer %{buildroot}%{_unitdir}/
 %{_localstatedir}/www/%{name}/*.txt
 %{_localstatedir}/www/%{name}/*.html
 %{_localstatedir}/www/%{name}/*.php
-%attr(0775, root, apache) %{_localstatedir}/www/%{name}/cache
-%attr(0775, root, apache) %{_localstatedir}/www/%{name}/upload
+%attr(0775, root, %{name}) %{_localstatedir}/www/%{name}/cache
+%attr(0775, root, %{name}) %{_localstatedir}/www/%{name}/upload
 
 %changelog
