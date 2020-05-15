@@ -6,7 +6,8 @@ Type=oneshot
 User=suitecrm
 Group=suitecrm
 WorkingDirectory=/var/www/suitecrm
-Environment=SUGAR_PATH=/var/www/suitecrm
+Environment=LD_PRELOAD=libphpturd.so
+Environment=PHPTURD=/usr/share/suitecrm:/var/www/suitecrm
 ExecStart=/usr/bin/php -f cron.php
 
 [Install]

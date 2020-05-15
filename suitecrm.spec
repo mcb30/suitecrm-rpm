@@ -10,14 +10,14 @@ Source2:	%{name}-scheduler.service
 Source3:	%{name}-scheduler.timer
 Source4:	%{name}-fpm.conf
 Source5:	%{name}-httpd.conf
-Source6:	%{name}-prepend.php
-Source7:	%{name}-config.php
+Source6:	%{name}-config.php
 BuildArch:	noarch
 BuildRequires:	findutils
 BuildRequires:	sed
 BuildRequires:	systemd
 Requires:	httpd-filesystem
 Requires:	nginx-filesystem
+Requires:	phpturd
 Requires:	php-cli
 Requires:	php-curl
 Requires:	php-fpm
@@ -94,18 +94,13 @@ install -D -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/%{name}-scheduler.service
 install -D -m 644 %{SOURCE3} %{buildroot}%{_unitdir}/%{name}-scheduler.timer
 install -D -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/php-fpm.d/%{name}.conf
 install -D -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/httpd/conf.d/%{name}.conf
-install -D -m 644 %{SOURCE6} %{buildroot}%{_datadir}/%{name}/prepend.php
-install -D -m 644 %{SOURCE7} %{buildroot}%{_sysconfdir}/%{name}/config.php
+install -D -m 644 %{SOURCE6} %{buildroot}%{_sysconfdir}/%{name}/config.php
 
 # Create www directory and symlinks
 #
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/cache
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/upload
-for link in include modules themes ; do
-    ln -r -s %{buildroot}%{_datadir}/%{name}/${link} \
-       %{buildroot}%{_localstatedir}/www/%{name}/${link}
-done
 ln -r -s %{buildroot}%{_sysconfdir}/%{name}/config.php \
    %{buildroot}%{_localstatedir}/www/%{name}/config.php
 
@@ -146,9 +141,6 @@ mkdir -p %{buildroot}%{_localstatedir}/log/%{name}
 %ghost %{_localstatedir}/log/%{name}/error.log
 %ghost %{_localstatedir}/log/%{name}/slow.log
 %dir %{_localstatedir}/www/%{name}
-%{_localstatedir}/www/%{name}/include
-%{_localstatedir}/www/%{name}/modules
-%{_localstatedir}/www/%{name}/themes
 %{_localstatedir}/www/%{name}/config.php
 %attr(0775, root, %{name}) %{_localstatedir}/www/%{name}/cache
 %attr(0775, root, %{name}) %{_localstatedir}/www/%{name}/upload
