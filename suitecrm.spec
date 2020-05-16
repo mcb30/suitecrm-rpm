@@ -107,7 +107,6 @@ install -D -m 644 %{SOURCE7} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 # Create www directory
 #
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}
-mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/cache
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/custom
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/install
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/upload
@@ -116,6 +115,12 @@ mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/upload
 #
 touch %{buildroot}%{_sysconfdir}/%{name}/api.key
 touch %{buildroot}%{_localstatedir}/www/%{name}/install/status.json
+
+# Create cache directory and symlink
+#
+mkdir -p %{buildroot}%{_localstatedir}/cache/%{name}
+ln_via_root %{_localstatedir}/cache/%{name} \
+	    %{_localstatedir}/www/%{name}/cache
 
 # Create symlinks within SuiteCRM tree for files stored elsewhere
 #
@@ -166,7 +171,7 @@ dd if=/dev/random of=%{_sysconfdir}/%{name}/api.key bs=32 count=1
 %{_unitdir}/%{name}-scheduler.service
 %{_unitdir}/%{name}-scheduler.timer
 %{_datadir}/%{name}
-%dir %attr(0770, root, %{name}) %{_localstatedir}/lib/%{name}
+%dir %attr(0750, root, %{name}) %{_localstatedir}/lib/%{name}
 %dir %attr(0770, root, %{name}) %{_localstatedir}/lib/%{name}/session
 %dir %attr(0770, root, %{name}) %{_localstatedir}/lib/%{name}/wsdlcache
 %dir %attr(0770, root, %{name}) %{_localstatedir}/log/%{name}
@@ -174,9 +179,10 @@ dd if=/dev/random of=%{_sysconfdir}/%{name}/api.key bs=32 count=1
 %ghost %attr(0640, %{name}, %{name}) %{_localstatedir}/log/%{name}/slow.log
 %ghost %attr(0640, %{name}, %{name}) %{_localstatedir}/log/%{name}/install.log
 %ghost %attr(0640, %{name}, %{name}) %{_localstatedir}/log/%{name}/suitecrm.log
+%dir %attr(0770, root, %{name}) %{_localstatedir}/cache/%{name}
+%{_localstatedir}/www/%{name}/cache
 %dir %{_localstatedir}/www/%{name}
 %dir %{_localstatedir}/www/%{name}/install
-%dir %attr(0770, root, %{name}) %{_localstatedir}/www/%{name}/cache
 %dir %attr(0770, root, %{name}) %{_localstatedir}/www/%{name}/custom
 %dir %attr(0770, root, %{name}) %{_localstatedir}/www/%{name}/upload
 %attr(0660, root, %{name}) %{_localstatedir}/www/%{name}/install/status.json
