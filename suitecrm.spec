@@ -122,7 +122,10 @@ install -D -m 644 %{SOURCE7} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 #
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/cache
+mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/custom/modules
+mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/install
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/upload
+touch %{buildroot}%{_localstatedir}/www/%{name}/install/status.json
 ln_via_root %{_sysconfdir}/%{name}/config.php \
 	    %{_localstatedir}/www/%{name}/config.php
 ln_via_root %{_localstatedir}/log/%{name}/install.log \
@@ -167,19 +170,23 @@ done
 %{_unitdir}/%{name}-scheduler.service
 %{_unitdir}/%{name}-scheduler.timer
 %{_datadir}/%{name}
-%attr(0770, root, %{name}) %dir %{_localstatedir}/lib/%{name}
-%attr(0770, root, %{name}) %dir %{_localstatedir}/lib/%{name}/session
-%attr(0770, root, %{name}) %dir %{_localstatedir}/lib/%{name}/wsdlcache
-%attr(0770, root, %{name}) %dir %{_localstatedir}/log/%{name}
+%dir %attr(0770, root, %{name}) %{_localstatedir}/lib/%{name}
+%dir %attr(0770, root, %{name}) %{_localstatedir}/lib/%{name}/session
+%dir %attr(0770, root, %{name}) %{_localstatedir}/lib/%{name}/wsdlcache
+%dir %attr(0770, root, %{name}) %{_localstatedir}/log/%{name}
 %ghost %attr(0640, %{name}, %{name}) %{_localstatedir}/log/%{name}/error.log
 %ghost %attr(0640, %{name}, %{name}) %{_localstatedir}/log/%{name}/slow.log
 %ghost %attr(0640, %{name}, %{name}) %{_localstatedir}/log/%{name}/install.log
 %ghost %attr(0640, %{name}, %{name}) %{_localstatedir}/log/%{name}/suitecrm.log
 %dir %{_localstatedir}/www/%{name}
+%dir %{_localstatedir}/www/%{name}/custom
+%dir %{_localstatedir}/www/%{name}/install
+%dir %attr(0770, root, %{name}) %{_localstatedir}/www/%{name}/cache
+%dir %attr(0770, root, %{name}) %{_localstatedir}/www/%{name}/custom/modules
+%dir %attr(0770, root, %{name}) %{_localstatedir}/www/%{name}/upload
 %{_localstatedir}/www/%{name}/config.php
 %{_localstatedir}/www/%{name}/install.log
 %{_localstatedir}/www/%{name}/suitecrm.log
-%attr(0775, root, %{name}) %{_localstatedir}/www/%{name}/cache
-%attr(0775, root, %{name}) %{_localstatedir}/www/%{name}/upload
+%attr(0660, root, %{name}) %{_localstatedir}/www/%{name}/install/status.json
 
 %changelog
