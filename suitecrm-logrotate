@@ -1,0 +1,10 @@
+/var/log/suitecrm/*.log {
+	compress
+	create 0640 suitecrm suitecrm
+	missingok
+	notifempty
+	postrotate
+		/usr/bin/systemctl try-restart php-fpm.service
+	endscript
+	sharedscripts
+}

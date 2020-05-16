@@ -11,12 +11,14 @@ Source3:	%{name}-scheduler.timer
 Source4:	%{name}-fpm.conf
 Source5:	%{name}-httpd.conf
 Source6:	%{name}-config.php
+Source7:	%{name}-logrotate
 BuildArch:	noarch
 BuildRequires:	findutils
 BuildRequires:	sed
 BuildRequires:	systemd
 Requires:	httpd-filesystem
 Requires:	nginx-filesystem
+Requires:	logrotate
 Requires:	phpturd
 Requires:	php-cli
 Requires:	php-curl
@@ -101,6 +103,7 @@ install -D -m 644 %{SOURCE3} %{buildroot}%{_unitdir}/%{name}-scheduler.timer
 install -D -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/php-fpm.d/%{name}.conf
 install -D -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/httpd/conf.d/%{name}.conf
 install -D -m 644 %{SOURCE6} %{buildroot}%{_sysconfdir}/%{name}/config.php
+install -D -m 644 %{SOURCE7} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 
 # Create www directory and symlinks
 #
@@ -146,6 +149,7 @@ done
 %config(noreplace) %{_sysconfdir}/%{name}/config.php
 %config(noreplace) %{_sysconfdir}/php-fpm.d/%{name}.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
+%config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %{_sysusersdir}/%{name}.conf
 %{_unitdir}/%{name}-scheduler.service
 %{_unitdir}/%{name}-scheduler.timer
