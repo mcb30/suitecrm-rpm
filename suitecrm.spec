@@ -12,6 +12,8 @@ Source4:	%{name}-fpm.conf
 Source5:	%{name}-httpd.conf
 Source6:	%{name}-config.php
 Source7:	%{name}-logrotate
+Patch1:		0001-rpm-Kill-the-make_writable-function.patch
+Patch2:		0002-rpm-Bypass-writability-checks-for-config.php-and-con.patch
 BuildArch:	noarch
 BuildRequires:	findutils
 BuildRequires:	sed
@@ -37,7 +39,7 @@ SuiteCRM is an open source Customer Relationship Management (CRM)
 application written in PHP.
 
 %prep
-%autosetup -n SuiteCRM-%{version}
+%autosetup -n SuiteCRM-%{version} -p 1
 
 %build
 
@@ -45,23 +47,6 @@ application written in PHP.
 # Kill it with fire.
 #
 rm -f include/SuiteGraphs/rgraph/scripts/jsmin
-
-# The SuiteCRM make_writable() function is an abomination from the
-# depths of hell that brings ten thousand years of shame upon its
-# author.  Disembowel it gently with a railgun.
-#
-sed -i -E "/^function make_writable/,/^}/c \
-function make_writable(\$file) {\n\
-  # This code was removed for its own protection\n\
-  return true;\n\
-}" install/install_utils.php
-
-# SuiteCRM obviously includes some open-coded checks for writable
-# files that completely ignore SuiteCRM's own function for checking
-# writability.  Why would you expect otherwise?
-#
-sed -i -E "s/is_writable\('\.\/config.*?'\)/true/g" \
-    install/installSystemCheck.php
 
 # The SuiteCRM distribution zipfile includes a cache directory.  It is
 # not empty.  Justified rage fills my soul.  Let the bloodshed

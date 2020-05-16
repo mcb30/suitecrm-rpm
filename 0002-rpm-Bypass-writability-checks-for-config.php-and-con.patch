@@ -1,0 +1,41 @@
+From f54da53ee1a6ba3b68ffd3cd415b50892af7dd26 Mon Sep 17 00:00:00 2001
+From: Michael Brown <mbrown@fensystems.co.uk>
+Date: Sat, 16 May 2020 19:11:39 +0100
+Subject: [PATCH 2/3] rpm: Bypass writability checks for config.php and
+ config-override.php
+
+Force the installer to proceed despite being unable to directly write
+to config.php.  It will correctly present the generated config.php for
+download and installation by an administrator, which should be the
+default behaviour anyway.
+
+Signed-off-by: Michael Brown <mbrown@fensystems.co.uk>
+---
+ install/installSystemCheck.php | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/install/installSystemCheck.php b/install/installSystemCheck.php
+index 830308f33..7be84e054 100755
+--- a/install/installSystemCheck.php
++++ b/install/installSystemCheck.php
+@@ -201,7 +201,7 @@ function runCheck($install_script, $mod_strings = array())
+     }
+ 
+     // config.php
+-    if (file_exists('./config.php') && (!(make_writable('./config.php')) ||  !(is_writable('./config.php')))) {
++    if (file_exists('./config.php') && (!(make_writable('./config.php')))) {
+         installLog("ERROR:: {$mod_strings['ERR_CHECKSYS_CONFIG_NOT_WRITABLE']}");
+         $configStatus = "<b><span class='stop'>{$mod_strings['ERR_CHECKSYS_CONFIG_NOT_WRITABLE']}</span></b>";
+         $error_found = true;
+@@ -212,7 +212,7 @@ function runCheck($install_script, $mod_strings = array())
+     }
+ 
+     // config_override.php
+-    if (file_exists('./config_override.php') && (!(make_writable('./config_override.php')) ||  !(is_writable('./config_override.php')))) {
++    if (file_exists('./config_override.php') && (!(make_writable('./config_override.php')))) {
+         installLog("ERROR:: {$mod_strings['ERR_CHECKSYS_CONFIG_OVERRIDE_NOT_WRITABLE']}");
+         $configStatus = "<b><span class='stop'>{$mod_strings['ERR_CHECKSYS_CONFIG_OVERRIDE_NOT_WRITABLE']}</span></b>";
+         $error_found = true;
+-- 
+2.25.1
+
