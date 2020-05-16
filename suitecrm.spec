@@ -122,7 +122,7 @@ install -D -m 644 %{SOURCE7} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 #
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/cache
-mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/custom/modules
+mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/custom
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/install
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/upload
 touch %{buildroot}%{_localstatedir}/www/%{name}/install/status.json
@@ -179,10 +179,9 @@ done
 %ghost %attr(0640, %{name}, %{name}) %{_localstatedir}/log/%{name}/install.log
 %ghost %attr(0640, %{name}, %{name}) %{_localstatedir}/log/%{name}/suitecrm.log
 %dir %{_localstatedir}/www/%{name}
-%dir %{_localstatedir}/www/%{name}/custom
 %dir %{_localstatedir}/www/%{name}/install
 %dir %attr(0770, root, %{name}) %{_localstatedir}/www/%{name}/cache
-%dir %attr(0770, root, %{name}) %{_localstatedir}/www/%{name}/custom/modules
+%dir %attr(0770, root, %{name}) %{_localstatedir}/www/%{name}/custom
 %dir %attr(0770, root, %{name}) %{_localstatedir}/www/%{name}/upload
 %{_localstatedir}/www/%{name}/config.php
 %{_localstatedir}/www/%{name}/install.log
