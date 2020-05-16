@@ -109,6 +109,10 @@ mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/cache
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/upload
 ln -r -s %{buildroot}%{_sysconfdir}/%{name}/config.php \
    %{buildroot}%{_localstatedir}/www/%{name}/config.php
+ln -r -s %{buildroot}%{_localstatedir}/log/%{name}/install.log \
+   %{buildroot}%{_localstatedir}/www/%{name}/install.log
+ln -r -s %{buildroot}%{_localstatedir}/log/%{name}/suitecrm.log \
+   %{buildroot}%{_localstatedir}/www/%{name}/suitecrm.log
 
 # Create writable directories
 #
@@ -122,6 +126,12 @@ mkdir -p %{buildroot}%{_localstatedir}/log/%{name}
 
 %post
 %systemd_post %{name}-scheduler.service
+for logfile in error.log slow.log install.log suitecrm.log ; do
+    # Ensure logfiles exist, to avoid dangling symlinks
+    touch %{_localstatedir}/log/%{name}/${logfile}
+    chown %{name}:%{name} %{_localstatedir}/log/%{name}/${logfile}
+    chmod 0640 %{_localstatedir}/log/%{name}/${logfile}
+done
 
 %preun
 %systemd_preun %{name}-scheduler.service
@@ -140,14 +150,18 @@ mkdir -p %{buildroot}%{_localstatedir}/log/%{name}
 %{_unitdir}/%{name}-scheduler.service
 %{_unitdir}/%{name}-scheduler.timer
 %{_datadir}/%{name}
-%attr(0775, root, %{name}) %dir %{_localstatedir}/lib/%{name}
-%attr(0775, root, %{name}) %dir %{_localstatedir}/lib/%{name}/session
-%attr(0775, root, %{name}) %dir %{_localstatedir}/lib/%{name}/wsdlcache
-%attr(0775, root, %{name}) %dir %{_localstatedir}/log/%{name}
-%ghost %{_localstatedir}/log/%{name}/error.log
-%ghost %{_localstatedir}/log/%{name}/slow.log
+%attr(0770, root, %{name}) %dir %{_localstatedir}/lib/%{name}
+%attr(0770, root, %{name}) %dir %{_localstatedir}/lib/%{name}/session
+%attr(0770, root, %{name}) %dir %{_localstatedir}/lib/%{name}/wsdlcache
+%attr(0770, root, %{name}) %dir %{_localstatedir}/log/%{name}
+%ghost %attr(0640, %{name}, %{name}) %{_localstatedir}/log/%{name}/error.log
+%ghost %attr(0640, %{name}, %{name}) %{_localstatedir}/log/%{name}/slow.log
+%ghost %attr(0640, %{name}, %{name}) %{_localstatedir}/log/%{name}/install.log
+%ghost %attr(0640, %{name}, %{name}) %{_localstatedir}/log/%{name}/suitecrm.log
 %dir %{_localstatedir}/www/%{name}
 %{_localstatedir}/www/%{name}/config.php
+%{_localstatedir}/www/%{name}/install.log
+%{_localstatedir}/www/%{name}/suitecrm.log
 %attr(0775, root, %{name}) %{_localstatedir}/www/%{name}/cache
 %attr(0775, root, %{name}) %{_localstatedir}/www/%{name}/upload
 
