@@ -14,6 +14,7 @@ Source6:	%{name}-config.php
 Source7:	%{name}-logrotate
 Patch1:		0001-rpm-Kill-the-make_writable-function.patch
 Patch2:		0002-rpm-Bypass-writability-checks-for-config.php-and-con.patch
+Patch3:		0003-rpm-Store-OAuth2-encryption-key-in-a-data-file-rathe.patch
 BuildArch:	noarch
 BuildRequires:	findutils
 BuildRequires:	sed
@@ -113,6 +114,7 @@ mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/upload
 
 # Create empty placeholder files
 #
+touch %{buildroot}%{_sysconfdir}/%{name}/api.key
 touch %{buildroot}%{_localstatedir}/www/%{name}/install/status.json
 
 # Create symlinks within SuiteCRM tree for files stored elsewhere
@@ -142,6 +144,8 @@ for logfile in error.log slow.log install.log suitecrm.log ; do
     chown %{name}:%{name} %{_localstatedir}/log/%{name}/${logfile}
     chmod 0640 %{_localstatedir}/log/%{name}/${logfile}
 done
+# Generate an API key
+dd if=/dev/random of=%{_sysconfdir}/%{name}/api.key bs=32 count=1
 
 %preun
 %systemd_preun %{name}-scheduler.service
@@ -154,6 +158,7 @@ done
 %license LICENSE.txt
 %dir %{_sysconfdir}/%{name}
 %config(noreplace) %{_sysconfdir}/%{name}/config.php
+%config(noreplace) %attr(0640, root, %{name}) %{_sysconfdir}/%{name}/api.key
 %config(noreplace) %{_sysconfdir}/php-fpm.d/%{name}.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
