@@ -76,6 +76,19 @@ chmod -R g-w,o-w .
 
 %install
 
+# Create relative symlink via root directory.  This is required to
+# ensure that symlink contents remain valid even when viewed through
+# the lens of the virtual filesystem provided by phpturd.
+#
+function ln_via_root() {
+    target=$1
+    link=$2
+
+    ln -s -r %{buildroot} %{buildroot}${link}
+    toplink=$(readlink %{buildroot}${link})
+    ln -s -f -T ${toplink}${target} %{buildroot}${link}
+}
+
 # Install SuiteCRM files
 #
 mkdir -p %{buildroot}%{_datadir}/%{name}
@@ -92,8 +105,8 @@ rm %{buildroot}%{_datadir}/%{name}/README.md
 # Replace LICENSE.txt with a symlink
 #
 rm %{buildroot}%{_datadir}/%{name}/LICENSE.txt
-ln -r -s %{buildroot}%{_defaultlicensedir}/%{name}/LICENSE.txt \
-   %{buildroot}%{_datadir}/%{name}/LICENSE.txt
+ln_via_root %{_defaultlicensedir}/%{name}/LICENSE.txt \
+	    %{_datadir}/%{name}/LICENSE.txt
 
 # Install package files
 #
@@ -110,12 +123,12 @@ install -D -m 644 %{SOURCE7} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/cache
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/upload
-ln -r -s %{buildroot}%{_sysconfdir}/%{name}/config.php \
-   %{buildroot}%{_localstatedir}/www/%{name}/config.php
-ln -r -s %{buildroot}%{_localstatedir}/log/%{name}/install.log \
-   %{buildroot}%{_localstatedir}/www/%{name}/install.log
-ln -r -s %{buildroot}%{_localstatedir}/log/%{name}/suitecrm.log \
-   %{buildroot}%{_localstatedir}/www/%{name}/suitecrm.log
+ln_via_root %{_sysconfdir}/%{name}/config.php \
+	    %{_localstatedir}/www/%{name}/config.php
+ln_via_root %{_localstatedir}/log/%{name}/install.log \
+	    %{_localstatedir}/www/%{name}/install.log
+ln_via_root %{_localstatedir}/log/%{name}/suitecrm.log \
+	    %{_localstatedir}/www/%{name}/suitecrm.log
 
 # Create writable directories
 #
