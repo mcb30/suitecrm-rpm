@@ -118,22 +118,28 @@ install -D -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/httpd/conf.d/%{name}.con
 install -D -m 644 %{SOURCE6} %{buildroot}%{_sysconfdir}/%{name}/config.php
 install -D -m 644 %{SOURCE7} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 
-# Create www directory and symlinks
+# Create www directory
 #
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/cache
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/custom
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/install
 mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/upload
-touch %{buildroot}%{_localstatedir}/www/%{name}/install/status.json
-ln_via_root %{_sysconfdir}/%{name}/config.php \
-	    %{_localstatedir}/www/%{name}/config.php
-ln_via_root %{_localstatedir}/log/%{name}/install.log \
-	    %{_localstatedir}/www/%{name}/install.log
-ln_via_root %{_localstatedir}/log/%{name}/suitecrm.log \
-	    %{_localstatedir}/www/%{name}/suitecrm.log
 
-# Create writable directories
+# Create empty placeholder files
+#
+touch %{buildroot}%{_localstatedir}/www/%{name}/install/status.json
+
+# Create symlinks within SuiteCRM tree for files stored elsewhere
+#
+ln_via_root %{_sysconfdir}/%{name}/config.php \
+	    %{_datadir}/%{name}/config.php
+ln_via_root %{_localstatedir}/log/%{name}/install.log \
+	    %{_datadir}/%{name}/install.log
+ln_via_root %{_localstatedir}/log/%{name}/suitecrm.log \
+	    %{_datadir}/%{name}/suitecrm.log
+
+# Create other writable directories
 #
 mkdir -p %{buildroot}%{_localstatedir}/lib/%{name}
 mkdir -p %{buildroot}%{_localstatedir}/lib/%{name}/session
@@ -183,9 +189,6 @@ done
 %dir %attr(0770, root, %{name}) %{_localstatedir}/www/%{name}/cache
 %dir %attr(0770, root, %{name}) %{_localstatedir}/www/%{name}/custom
 %dir %attr(0770, root, %{name}) %{_localstatedir}/www/%{name}/upload
-%{_localstatedir}/www/%{name}/config.php
-%{_localstatedir}/www/%{name}/install.log
-%{_localstatedir}/www/%{name}/suitecrm.log
 %attr(0660, root, %{name}) %{_localstatedir}/www/%{name}/install/status.json
 
 %changelog
