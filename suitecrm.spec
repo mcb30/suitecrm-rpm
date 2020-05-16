@@ -61,6 +61,12 @@ function make_writable(\$file) {\n\
 sed -i -E "s/is_writable\('\.\/config.*?'\)/true/g" \
     install/installSystemCheck.php
 
+# The SuiteCRM distribution zipfile includes a cache directory.  It is
+# not empty.  Justified rage fills my soul.  Let the bloodshed
+# commence.
+#
+rm -rf cache upload
+
 # Fix file permissions
 #
 find . -type f -exec chmod a-x \{\} \;
