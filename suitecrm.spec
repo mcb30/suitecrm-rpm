@@ -156,8 +156,8 @@ dd if=/dev/random of=%{_sysconfdir}/%{name}/api.key bs=32 count=1
 %files
 %doc README.md
 %license LICENSE.txt
-%dir %{_sysconfdir}/%{name}
-%config(noreplace) %{_sysconfdir}/%{name}/config.php
+%dir %attr(0750, root, %{name}) %{_sysconfdir}/%{name}
+%config(noreplace) %attr(0640, root, %{name}) %{_sysconfdir}/%{name}/config.php
 %config(noreplace) %attr(0640, root, %{name}) %{_sysconfdir}/%{name}/api.key
 %config(noreplace) %{_sysconfdir}/php-fpm.d/%{name}.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
