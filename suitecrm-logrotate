@@ -1,4 +1,4 @@
-/var/log/suitecrm/*.log {
+/var/log/suitecrm/*/*.log {
 	compress
 	create 0640 suitecrm suitecrm
 	missingok

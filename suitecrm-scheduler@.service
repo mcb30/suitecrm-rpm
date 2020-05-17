@@ -1,13 +1,14 @@
 [Unit]
-Description=Run SuiteCRM scheduler
+Description=SuiteCRM %i scheduler
 
 [Service]
 Type=oneshot
 User=suitecrm
 Group=suitecrm
-WorkingDirectory=/var/www/suitecrm
+StateDirectory=suitecrm/%i
+WorkingDirectory=/var/lib/suitecrm/%i
 Environment=LD_PRELOAD=libphpturd.so
-Environment=PHPTURD=/usr/share/suitecrm:/var/www/suitecrm
+Environment=PHPTURD=/usr/share/suitecrm/code:/var/lib/suitecrm/%i
 ExecStart=/usr/bin/php -f cron.php
 
 [Install]

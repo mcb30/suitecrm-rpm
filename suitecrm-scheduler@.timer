@@ -1,9 +1,9 @@
 [Unit]
-Description=Run SuiteCRM scheduler
+Description=SuiteCRM %i scheduler
 
 [Timer]
 OnUnitInactiveSec=1min
-Unit=suitecrm-scheduler.service
+Unit=suitecrm-scheduler@%i.service
 
 [Install]
 WantedBy=multi-user.target

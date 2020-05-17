@@ -6,11 +6,11 @@ License:	Affero GPLv3
 URL:		https://suitecrm.com/
 Source0:	https://suitecrm.com/files/162/SuiteCRM-7.11/500/SuiteCRM-%{version}.zip
 Source1:	%{name}-sysusers.conf
-Source2:	%{name}-scheduler.service
-Source3:	%{name}-scheduler.timer
-Source4:	%{name}-fpm.conf
-Source5:	%{name}-httpd.conf
-Source6:	%{name}-config.php
+Source2:	%{name}-setup
+Source3:	%{name}@.service
+Source4:	%{name}-scheduler@.service
+Source5:	%{name}-scheduler@.timer
+Source6:	%{name}-httpd.conf
 Source7:	%{name}-logrotate
 Patch1:		0001-rpm-Kill-the-make_writable-function.patch
 Patch2:		0002-rpm-Bypass-writability-checks-for-config.php-and-con.patch
@@ -62,129 +62,77 @@ chmod -R g-w,o-w .
 
 %install
 
-# Create relative symlink via root directory.  This is required to
-# ensure that symlink contents remain valid even when viewed through
-# the lens of the virtual filesystem provided by phpturd.
-#
-function ln_via_root() {
-    target=$1
-    link=$2
-
-    ln -s -r %{buildroot} %{buildroot}${link}
-    toplink=$(readlink %{buildroot}${link})
-    ln -s -f -T ${toplink}${target} %{buildroot}${link}
-}
-
 # Install SuiteCRM files
 #
-mkdir -p %{buildroot}%{_datadir}/%{name}
-cp -a * %{buildroot}%{_datadir}/%{name}/
+mkdir -p %{buildroot}%{_datadir}/%{name}/code
+cp -a * %{buildroot}%{_datadir}/%{name}/code/
 
 # Remove unwanted SuiteCRM files
 #
-rm %{buildroot}%{_datadir}/%{name}/*.json
-rm %{buildroot}%{_datadir}/%{name}/*.lock
-rm %{buildroot}%{_datadir}/%{name}/*.md5
-rm %{buildroot}%{_datadir}/%{name}/*.xml
-rm %{buildroot}%{_datadir}/%{name}/README.md
-
-# Replace LICENSE.txt with a symlink
-#
-rm %{buildroot}%{_datadir}/%{name}/LICENSE.txt
-ln_via_root %{_defaultlicensedir}/%{name}/LICENSE.txt \
-	    %{_datadir}/%{name}/LICENSE.txt
+rm %{buildroot}%{_datadir}/%{name}/code/*.json
+rm %{buildroot}%{_datadir}/%{name}/code/*.lock
+rm %{buildroot}%{_datadir}/%{name}/code/*.md5
+rm %{buildroot}%{_datadir}/%{name}/code/*.xml
+rm %{buildroot}%{_datadir}/%{name}/code/README.md
 
 # Install package files
 #
 install -D -m 644 %{SOURCE1} %{buildroot}%{_sysusersdir}/%{name}.conf
-install -D -m 644 %{SOURCE2} %{buildroot}%{_unitdir}/%{name}-scheduler.service
-install -D -m 644 %{SOURCE3} %{buildroot}%{_unitdir}/%{name}-scheduler.timer
-install -D -m 644 %{SOURCE4} %{buildroot}%{_sysconfdir}/php-fpm.d/%{name}.conf
-install -D -m 644 %{SOURCE5} %{buildroot}%{_sysconfdir}/httpd/conf.d/%{name}.conf
-install -D -m 644 %{SOURCE6} %{buildroot}%{_sysconfdir}/%{name}/config.php
+install -D -m 755 %{SOURCE2} %{buildroot}%{_libexecdir}/%{name}-setup
+install -D -m 644 %{SOURCE3} %{buildroot}%{_unitdir}/%{name}@.service
+install -D -m 644 %{SOURCE4} %{buildroot}%{_unitdir}/%{name}-scheduler@.service
+install -D -m 644 %{SOURCE5} %{buildroot}%{_unitdir}/%{name}-scheduler@.timer
+install -D -m 644 %{SOURCE6} %{buildroot}%{_sysconfdir}/httpd/conf.d/%{name}.conf
 install -D -m 644 %{SOURCE7} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 
-# Create www directory
+# Create systemd placeholder directories
 #
-mkdir -p %{buildroot}%{_localstatedir}/www/%{name}
-mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/custom
-mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/install
-mkdir -p %{buildroot}%{_localstatedir}/www/%{name}/upload
-
-# Create empty placeholder files
-#
-touch %{buildroot}%{_sysconfdir}/%{name}/api.key
-touch %{buildroot}%{_localstatedir}/www/%{name}/install/status.json
-
-# Create cache directory and symlink
-#
+mkdir -p %{buildroot}%{_sysconfdir}/%{name}
+mkdir -p %{buildroot}%{_sharedstatedir}/%{name}
 mkdir -p %{buildroot}%{_localstatedir}/cache/%{name}
-ln_via_root %{_localstatedir}/cache/%{name} \
-	    %{_localstatedir}/www/%{name}/cache
-
-# Create symlinks within SuiteCRM tree for files stored elsewhere
-#
-ln_via_root %{_sysconfdir}/%{name}/config.php \
-	    %{_datadir}/%{name}/config.php
-ln_via_root %{_localstatedir}/log/%{name}/install.log \
-	    %{_datadir}/%{name}/install.log
-ln_via_root %{_localstatedir}/log/%{name}/suitecrm.log \
-	    %{_datadir}/%{name}/suitecrm.log
-
-# Create other writable directories
-#
-mkdir -p %{buildroot}%{_localstatedir}/lib/%{name}
-mkdir -p %{buildroot}%{_localstatedir}/lib/%{name}/session
-mkdir -p %{buildroot}%{_localstatedir}/lib/%{name}/wsdlcache
 mkdir -p %{buildroot}%{_localstatedir}/log/%{name}
+
+# Create systemd default units
+#
+for unit in %{name}@.service \
+	    %{name}-scheduler@.service \
+	    %{name}-scheduler@.timer ; do
+    sed "s/%i/default/" %{buildroot}/%{_unitdir}/${unit} > \
+	%{buildroot}/%{_unitdir}/${unit/@/}
+done
 
 %pre
 %sysusers_create_package %{name} %{SOURCE1}
 
 %post
+%systemd_post %{name}.service
 %systemd_post %{name}-scheduler.service
-for logfile in error.log slow.log install.log suitecrm.log ; do
-    # Ensure logfiles exist, to avoid dangling symlinks
-    touch %{_localstatedir}/log/%{name}/${logfile}
-    chown %{name}:%{name} %{_localstatedir}/log/%{name}/${logfile}
-    chmod 0640 %{_localstatedir}/log/%{name}/${logfile}
-done
-# Generate an API key
-dd if=/dev/random of=%{_sysconfdir}/%{name}/api.key bs=32 count=1
 
 %preun
+%systemd_preun %{name}.service
 %systemd_preun %{name}-scheduler.service
 
 %postun
+%systemd_postun_with_restart %{name}.service
 %systemd_postun_with_restart %{name}-scheduler.service
 
 %files
 %doc README.md
 %license LICENSE.txt
 %dir %attr(0750, root, %{name}) %{_sysconfdir}/%{name}
-%config(noreplace) %attr(0640, root, %{name}) %{_sysconfdir}/%{name}/config.php
-%config(noreplace) %attr(0640, root, %{name}) %{_sysconfdir}/%{name}/api.key
-%config(noreplace) %{_sysconfdir}/php-fpm.d/%{name}.conf
+%dir %attr(0750, root, %{name}) %{_sharedstatedir}/%{name}
+%dir %attr(0750, root, %{name}) %{_localstatedir}/cache/%{name}
+%dir %attr(0750, root, %{name}) %{_localstatedir}/log/%{name}
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %{_sysusersdir}/%{name}.conf
+%{_libexecdir}/%{name}-setup
+%{_unitdir}/%{name}@.service
+%{_unitdir}/%{name}.service
+%{_unitdir}/%{name}-scheduler@.service
 %{_unitdir}/%{name}-scheduler.service
+%{_unitdir}/%{name}-scheduler@.timer
 %{_unitdir}/%{name}-scheduler.timer
-%{_datadir}/%{name}
-%dir %attr(0750, root, %{name}) %{_localstatedir}/lib/%{name}
-%dir %attr(0770, root, %{name}) %{_localstatedir}/lib/%{name}/session
-%dir %attr(0770, root, %{name}) %{_localstatedir}/lib/%{name}/wsdlcache
-%dir %attr(0770, root, %{name}) %{_localstatedir}/log/%{name}
-%ghost %attr(0640, %{name}, %{name}) %{_localstatedir}/log/%{name}/error.log
-%ghost %attr(0640, %{name}, %{name}) %{_localstatedir}/log/%{name}/slow.log
-%ghost %attr(0640, %{name}, %{name}) %{_localstatedir}/log/%{name}/install.log
-%ghost %attr(0640, %{name}, %{name}) %{_localstatedir}/log/%{name}/suitecrm.log
-%dir %attr(0770, root, %{name}) %{_localstatedir}/cache/%{name}
-%{_localstatedir}/www/%{name}/cache
-%dir %{_localstatedir}/www/%{name}
-%dir %{_localstatedir}/www/%{name}/install
-%dir %attr(0770, root, %{name}) %{_localstatedir}/www/%{name}/custom
-%dir %attr(0770, root, %{name}) %{_localstatedir}/www/%{name}/upload
-%attr(0660, root, %{name}) %{_localstatedir}/www/%{name}/install/status.json
+%{_datadir}/%{name}/code
 
 %changelog

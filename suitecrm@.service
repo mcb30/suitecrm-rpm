@@ -1,0 +1,19 @@
+[Unit]
+Description=SuiteCRM %i PHP-FPM
+After=syslog.target network.target
+
+[Service]
+Type=notify
+RuntimeDirectory=suitecrm/%i
+StateDirectory=suitecrm/%i
+CacheDirectory=suitecrm/%i
+LogsDirectory=suitecrm/%i
+ConfigurationDirectory=suitecrm/%i
+PrivateTmp=true
+Environment=LD_PRELOAD=libphpturd.so
+ExecStartPre=/usr/libexec/suitecrm-setup
+ExecStart=/usr/sbin/php-fpm -F -y ${RUNTIME_DIRECTORY}/php-fpm.conf
+ExecReload=/bin/kill -USR2 ${MAINPID}
+
+[Install]
+WantedBy=multi-user.target

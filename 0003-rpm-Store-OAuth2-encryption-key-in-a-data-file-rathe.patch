@@ -1,4 +1,4 @@
-From d07ffbc777b405aeac98db7ea475ef697d5aee00 Mon Sep 17 00:00:00 2001
+From 9a96efed7534d75b2b41655e8639f1ab3aadf609 Mon Sep 17 00:00:00 2001
 From: Michael Brown <mbrown@fensystems.co.uk>
 Date: Sat, 16 May 2020 19:14:45 +0100
 Subject: [PATCH 3/3] rpm: Store OAuth2 encryption key in a data file rather
@@ -25,14 +25,14 @@ Signed-off-by: Michael Brown <mbrown@fensystems.co.uk>
  1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/Api/Core/Config/ApiConfig.php b/Api/Core/Config/ApiConfig.php
-index d6db2a003..539639e25 100644
+index d6db2a003..8edf8ce8e 100644
 --- a/Api/Core/Config/ApiConfig.php
 +++ b/Api/Core/Config/ApiConfig.php
 @@ -1,6 +1,8 @@
  <?php
  namespace Api\Core\Config;
  
-+define('OAUTH2_ENCRYPTION_KEY_VALUE', file_get_contents('/etc/suitecrm/api.key');
++define('OAUTH2_ENCRYPTION_KEY_VALUE', file_get_contents(__DIR__.'/../../../api.key'));
 +
  class ApiConfig
  {

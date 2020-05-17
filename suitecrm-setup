@@ -1,0 +1,87 @@
+#!/bin/sh
+
+# Create writable directories
+#
+for rwdir in ${CACHE_DIRECTORY}/session \
+	     ${CACHE_DIRECTORY}/wsdl \
+	     ${CACHE_DIRECTORY}/cache \
+	     ${STATE_DIRECTORY}/custom \
+	     ${STATE_DIRECTORY}/upload ; do
+    mkdir -p ${rwdir}
+    chmod 0770 ${rwdir}
+    chgrp suitecrm ${rwdir}
+done
+
+# Create readonly directories
+#
+for rodir in ${STATE_DIRECTORY}/install ; do
+    mkdir -p ${rodir}
+    chmod 0750 ${rodir}
+    chgrp suitecrm ${rodir}
+done
+
+# Create writable placeholder files
+#
+for rwfile in ${STATE_DIRECTORY}/install/status.json \
+	      ${LOGS_DIRECTORY}/error.log \
+	      ${LOGS_DIRECTORY}/install.log \
+	      ${LOGS_DIRECTORY}/php-fpm.log \
+	      ${LOGS_DIRECTORY}/slow.log \
+	      ${LOGS_DIRECTORY}/suitecrm.log ; do
+    touch ${rwfile}
+    chmod 0660 ${rwfile}
+    chgrp suitecrm ${rwfile}
+done
+
+# Create readonly placeholder files
+#
+for rofile in ${CONFIGURATION_DIRECTORY}/config.php \
+	      ${CONFIGURATION_DIRECTORY}/api.key ; do
+    touch ${rofile}
+    chmod 0640 ${rofile}
+    chgrp suitecrm ${rofile}
+done
+
+# Create API key
+#
+if [ ! -s ${CONFIGURATION_DIRECTORY}/api.key ] ; then
+    head -c 32 /dev/random > ${CONFIGURATION_DIRECTORY}/api.key
+fi
+
+# Create symlinks
+#
+ln -s -f -T ${CACHE_DIRECTORY}/cache ${STATE_DIRECTORY}/cache
+ln -s -f -T ${LOGS_DIRECTORY}/install.log ${STATE_DIRECTORY}/install.log
+ln -s -f -T ${LOGS_DIRECTORY}/suitecrm.log ${STATE_DIRECTORY}/suitecrm.log
+ln -s -f -T ${CONFIGURATION_DIRECTORY}/config.php ${STATE_DIRECTORY}/config.php
+ln -s -f -T ${CONFIGURATION_DIRECTORY}/api.key ${STATE_DIRECTORY}/api.key
+
+# Create php-fpm configuration file
+#
+cat > ${RUNTIME_DIRECTORY}/php-fpm.conf <<EOF
+[global]
+pid=${RUNTIME_DIRECTORY}/php-fpm.pid
+error_log=${LOGS_DIRECTORY}/php-fpm.log
+daemonize=yes
+
+[pool]
+user = suitecrm
+group = suitecrm
+listen = ${RUNTIME_DIRECTORY}/php-fpm.sock
+listen.group = suitecrm
+pm = dynamic
+pm.max_children = 50
+pm.start_servers = 5
+pm.min_spare_servers = 5
+pm.max_spare_servers = 35
+slowlog = ${LOGS_DIRECTORY}/slow.log
+catch_workers_output = on
+php_admin_value[error_log] = ${LOGS_DIRECTORY}/error.log
+php_admin_flag[log_errors] = on
+php_value[session.save_handler] = files
+php_value[session.save_path] = ${CACHE_DIRECTORY}/session
+php_value[soap.wsdl_cache_dir] = ${CACHE_DIRECTORY}/wsdl
+php_value[upload_max_filesize] = 128M
+php_value[include_path] = /usr/share/suitecrm/code:${STATE_DIRECTORY}:/usr/share/pear
+env[PHPTURD] = /usr/share/suitecrm/code:${STATE_DIRECTORY}
+EOF
