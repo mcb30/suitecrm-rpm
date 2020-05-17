@@ -11,6 +11,7 @@ LogsDirectory=suitecrm/%i
 ConfigurationDirectory=suitecrm/%i
 PrivateTmp=true
 Environment=LD_PRELOAD=libphpturd.so
+Environment=PHPTURD=/usr/share/suitecrm/code:/var/lib/suitecrm/%i
 ExecStartPre=/usr/libexec/suitecrm-setup
 ExecStart=/usr/sbin/php-fpm -F -y ${RUNTIME_DIRECTORY}/php-fpm.conf
 ExecReload=/bin/kill -USR2 ${MAINPID}

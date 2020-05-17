@@ -1,5 +1,9 @@
 #!/bin/sh
 
+# Bypass phpturd virtual filesystem
+#
+unset PHPTURD
+
 # Create writable directories
 #
 for rwdir in ${CACHE_DIRECTORY}/session \
