@@ -11,7 +11,8 @@ Source3:	%{name}@.service
 Source4:	%{name}-scheduler@.service
 Source5:	%{name}-scheduler@.timer
 Source6:	%{name}-httpd.conf
-Source7:	%{name}-logrotate
+Source7:	%{name}-default-httpd.conf
+Source8:	%{name}-logrotate
 Patch1:		0001-rpm-Kill-the-make_writable-function.patch
 Patch2:		0002-rpm-Bypass-writability-checks-for-config.php-and-con.patch
 Patch3:		0003-rpm-Store-OAuth2-encryption-key-in-a-data-file-rathe.patch
@@ -82,8 +83,9 @@ install -D -m 755 %{SOURCE2} %{buildroot}%{_libexecdir}/%{name}-setup
 install -D -m 644 %{SOURCE3} %{buildroot}%{_unitdir}/%{name}@.service
 install -D -m 644 %{SOURCE4} %{buildroot}%{_unitdir}/%{name}-scheduler@.service
 install -D -m 644 %{SOURCE5} %{buildroot}%{_unitdir}/%{name}-scheduler@.timer
-install -D -m 644 %{SOURCE6} %{buildroot}%{_sysconfdir}/httpd/conf.d/%{name}.conf
-install -D -m 644 %{SOURCE7} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
+install -D -m 644 %{SOURCE6} %{buildroot}%{_sysconfdir}/httpd/conf.d/50-%{name}.conf
+install -D -m 644 %{SOURCE7} %{buildroot}%{_sysconfdir}/httpd/conf.d/%{name}-default.conf
+install -D -m 644 %{SOURCE8} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
 
 # Create systemd placeholder directories
 #
@@ -123,7 +125,8 @@ done
 %dir %attr(0750, root, %{name}) %{_sharedstatedir}/%{name}
 %dir %attr(0750, root, %{name}) %{_localstatedir}/cache/%{name}
 %dir %attr(0750, root, %{name}) %{_localstatedir}/log/%{name}
-%config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}.conf
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/50-%{name}.conf
+%config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}-default.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}
 %{_sysusersdir}/%{name}.conf
 %{_libexecdir}/%{name}-setup
