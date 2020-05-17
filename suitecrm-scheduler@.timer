@@ -3,7 +3,6 @@ Description=SuiteCRM %i scheduler
 
 [Timer]
 OnUnitInactiveSec=1min
-Unit=suitecrm-scheduler@%i.service
 
 [Install]
 WantedBy=multi-user.target
