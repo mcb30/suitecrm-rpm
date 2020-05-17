@@ -13,6 +13,7 @@ Source5:	%{name}-scheduler@.timer
 Source6:	%{name}-httpd.conf
 Source7:	%{name}-default-httpd.conf
 Source8:	%{name}-logrotate
+Source9:	README.md
 Patch1:		0001-rpm-Kill-the-make_writable-function.patch
 Patch2:		0002-rpm-Bypass-writability-checks-for-config.php-and-con.patch
 Patch3:		0003-rpm-Store-OAuth2-encryption-key-in-a-data-file-rathe.patch
@@ -61,6 +62,10 @@ rm -rf cache upload
 find . -type f -exec chmod a-x \{\} \;
 chmod -R g-w,o-w .
 
+# Add RPM readme
+#
+cp %{SOURCE9} README-RPM.md
+
 %install
 
 # Install SuiteCRM files
@@ -72,9 +77,9 @@ cp -a * %{buildroot}%{_datadir}/%{name}/code/
 #
 rm %{buildroot}%{_datadir}/%{name}/code/*.json
 rm %{buildroot}%{_datadir}/%{name}/code/*.lock
+rm %{buildroot}%{_datadir}/%{name}/code/*.md
 rm %{buildroot}%{_datadir}/%{name}/code/*.md5
 rm %{buildroot}%{_datadir}/%{name}/code/*.xml
-rm %{buildroot}%{_datadir}/%{name}/code/README.md
 
 # Install package files
 #
@@ -120,6 +125,7 @@ done
 
 %files
 %doc README.md
+%doc README-RPM.md
 %license LICENSE.txt
 %dir %attr(0750, root, %{name}) %{_sysconfdir}/%{name}
 %dir %attr(0750, root, %{name}) %{_sharedstatedir}/%{name}
