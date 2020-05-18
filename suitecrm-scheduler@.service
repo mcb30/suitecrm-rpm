@@ -5,7 +5,6 @@ Description=SuiteCRM %i scheduler
 Type=oneshot
 User=suitecrm
 Group=suitecrm
-StateDirectory=suitecrm/%i
 WorkingDirectory=/var/lib/suitecrm/%i
 Environment=LD_PRELOAD=libphpturd.so
 Environment=PHPTURD=/usr/share/suitecrm/code:/var/lib/suitecrm/%i
