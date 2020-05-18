@@ -1,3 +1,9 @@
+%define with_systemd_rpm_macros 1
+
+%if 0%{?rhel}
+%define with_systemd_rpm_macros 0
+%endif
+
 Name:		suitecrm
 Version:	7.11.13
 Release:	1%{?dist}
@@ -36,6 +42,10 @@ Requires:	php-pcre
 Requires:	php-xml
 Requires:	php-zip
 Requires:	php-zlib
+
+%if 0%{?with_systemd_rpm_macros}
+BuildRequires:	systemd-rpm-macros
+%endif
 
 %description
 SuiteCRM is an open source Customer Relationship Management (CRM)
