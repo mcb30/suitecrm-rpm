@@ -1,5 +1,5 @@
 [Unit]
-Description=SuiteCRM %i scheduler
+Description=SuiteCRM %i scheduler timer
 
 [Timer]
 OnBootSec=1min
