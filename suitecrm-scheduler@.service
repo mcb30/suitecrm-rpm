@@ -1,5 +1,6 @@
 [Unit]
 Description=SuiteCRM %i scheduler
+ConditionFileNotEmpty=/etc/suitecrm/%i/config.php
 
 [Service]
 Type=oneshot
