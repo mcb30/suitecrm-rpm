@@ -2,6 +2,7 @@
 Description=SuiteCRM %i scheduler
 
 [Timer]
+OnBootSec=1min
 OnUnitInactiveSec=1min
 
 [Install]
