@@ -108,6 +108,16 @@ for unit in %{name}@.service \
 	%{buildroot}/%{_unitdir}/${unit/@/}
 done
 
+# Mark permitted entry points
+#
+for file in index.php install.php \
+	    service/*/rest.php service/*/soap.php \
+	    themes/SuiteP/css/colourSelector.php \
+	    include/social/get_feed_data.php ; do
+    ln -s $(basename ${file}) \
+       %{buildroot}%{_datadir}/%{name}/code/${file}.entrypoint
+done
+
 %pre
 %sysusers_create_package %{name} %{SOURCE1}
 
