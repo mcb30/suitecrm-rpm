@@ -127,9 +127,9 @@ done
 %systemd_post %{name}-scheduler.timer
 
 %preun
-%systemd_preun %{name}.service
-%systemd_preun %{name}-scheduler.service
 %systemd_preun %{name}-scheduler.timer
+%systemd_preun %{name}-scheduler.service
+%systemd_preun %{name}.service
 
 %postun
 %systemd_postun_with_restart %{name}.service
