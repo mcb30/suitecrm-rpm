@@ -114,14 +114,17 @@ done
 %post
 %systemd_post %{name}.service
 %systemd_post %{name}-scheduler.service
+%systemd_post %{name}-scheduler.timer
 
 %preun
 %systemd_preun %{name}.service
 %systemd_preun %{name}-scheduler.service
+%systemd_preun %{name}-scheduler.timer
 
 %postun
 %systemd_postun_with_restart %{name}.service
 %systemd_postun_with_restart %{name}-scheduler.service
+%systemd_postun_with_restart %{name}-scheduler.timer
 
 %files
 %doc README.md
