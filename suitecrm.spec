@@ -20,6 +20,8 @@ Source6:	%{name}-httpd.conf
 Source7:	%{name}-default-httpd.conf
 Source8:	%{name}-logrotate
 Source9:	README.md
+Source10:	%{name}.te
+Source11:	%{name}.fc
 Patch1:		0001-rpm-Kill-the-make_writable-function.patch
 Patch2:		0002-rpm-Bypass-writability-checks-for-config.php-and-con.patch
 Patch3:		0003-rpm-Store-OAuth2-encryption-key-in-a-data-file-rathe.patch
@@ -42,6 +44,7 @@ Requires:	php-pcre
 Requires:	php-xml
 Requires:	php-zip
 Requires:	php-zlib
+%{?selinux_requires}
 
 %if 0%{?with_systemd_rpm_macros}
 BuildRequires:	systemd-rpm-macros
@@ -76,6 +79,13 @@ chmod -R g-w,o-w .
 #
 cp %{SOURCE9} README-RPM.md
 
+# Build SELinux policies
+#
+mkdir selinux
+cp %{SOURCE10} selinux/%{name}.te
+cp %{SOURCE11} selinux/%{name}.fc
+make -C selinux -f %{_datadir}/selinux/devel/Makefile %{name}.pp
+
 %install
 
 # Install SuiteCRM files
@@ -90,6 +100,7 @@ rm %{buildroot}%{_datadir}/%{name}/code/*.lock
 rm %{buildroot}%{_datadir}/%{name}/code/*.md
 rm %{buildroot}%{_datadir}/%{name}/code/*.md5
 rm %{buildroot}%{_datadir}/%{name}/code/*.xml
+rm -rf %{buildroot}%{_datadir}/%{name}/code/selinux/
 
 # Install package files
 #
@@ -128,10 +139,17 @@ for file in index.php install.php \
        %{buildroot}%{_datadir}/%{name}/code/${file}.entrypoint
 done
 
+# Install SELinux policy modules
+#
+install -D -m 644 selinux/%{name}.pp \
+	%{buildroot}%{_datadir}/selinux/packages/%{name}.pp
+
 %pre
+%selinux_relabel_pre
 %sysusers_create_package %{name} %{SOURCE1}
 
 %post
+%selinux_modules_install %{_datadir}/selinux/packages/%{name}.pp
 %systemd_post %{name}.service
 %systemd_post %{name}-scheduler.service
 %systemd_post %{name}-scheduler.timer
@@ -145,10 +163,15 @@ done
 %systemd_postun_with_restart %{name}.service
 %systemd_postun_with_restart %{name}-scheduler.service
 %systemd_postun_with_restart %{name}-scheduler.timer
+%selinux_modules_uninstall %{name}
+
+%posttrans
+%selinux_relabel_post
 
 %files
 %doc README.md
 %doc README-RPM.md
+%doc selinux/%{name}.fc
 %license LICENSE.txt
 %dir %attr(0750, root, %{name}) %{_sysconfdir}/%{name}
 %dir %attr(0750, root, %{name}) %{_sharedstatedir}/%{name}
@@ -166,5 +189,6 @@ done
 %{_unitdir}/%{name}-scheduler@.timer
 %{_unitdir}/%{name}-scheduler.timer
 %{_datadir}/%{name}/code
+%{_datadir}/selinux/packages/%{name}.pp
 
 %changelog

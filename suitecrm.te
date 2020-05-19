@@ -1,0 +1,17 @@
+policy_module(suitecrm,1.0.0)
+
+gen_require(`
+	type httpd_cache_t;
+	type httpd_log_t;
+	type httpd_var_lib_t;
+	type httpd_var_run_t;
+	type init_t;
+')
+
+# Allow systemd and suitecrm-setup to create the per-instance
+# subdirectories and entries therein.
+#
+allow init_t httpd_cache_t:dir add_name;
+allow init_t httpd_log_t:dir add_name;
+allow init_t httpd_var_lib_t:dir add_name;
+allow init_t httpd_var_run_t:dir add_name;

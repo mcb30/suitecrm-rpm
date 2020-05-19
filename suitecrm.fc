@@ -1,0 +1,4 @@
+/var/cache/suitecrm(/.*)?	system_u:object_r:httpd_cache_t:s0
+/var/lib/suitecrm(/.*)?		system_u:object_r:httpd_var_lib_t:s0
+/var/log/suitecrm(/.*)?		system_u:object_r:httpd_log_t:s0
+/var/run/suitecrm(/.*)?		system_u:object_r:httpd_var_run_t:s0
