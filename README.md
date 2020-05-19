@@ -105,6 +105,18 @@ the SuiteCRM code does not have permission to overwrite itself.  This
 is intentional: the system package manager is authoritative and may
 not be bypassed.
 
+API key
+-------
+
+An API key is generated automatically for each `suitecrm` service
+instance and stored in `/etc/suitecrm/<instance>/api.key`.  This
+replaces the API key that SuiteCRM attempts to store unsafely by
+rewriting the `ApiConfig.php` code file.
+
+You can safely ignore any log message similar to:
+
+    file_put_contents(Api/Core/Config/ApiConfig.php): Permission denied
+
 Patches
 -------
 
