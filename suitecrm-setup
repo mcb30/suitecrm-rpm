@@ -79,6 +79,7 @@ ln -s -f -T ${LOGS_DIRECTORY}/install.log ${STATE_DIRECTORY}/install.log
 ln -s -f -T ${LOGS_DIRECTORY}/suitecrm.log ${STATE_DIRECTORY}/suitecrm.log
 ln -s -f -T ${CONFIGURATION_DIRECTORY}/config.php ${STATE_DIRECTORY}/config.php
 ln -s -f -T ${CONFIGURATION_DIRECTORY}/api.key ${STATE_DIRECTORY}/api.key
+ln -s -f -T /dev/null ${STATE_DIRECTORY}/.htaccess
 
 # Create php-fpm configuration file
 #
