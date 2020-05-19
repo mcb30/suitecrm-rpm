@@ -1,6 +1,7 @@
 policy_module(suitecrm,1.0.0)
 
 gen_require(`
+	type httpd_t;
 	type httpd_cache_t;
 	type httpd_log_t;
 	type httpd_var_lib_t;
@@ -15,3 +16,10 @@ allow init_t httpd_cache_t:dir add_name;
 allow init_t httpd_log_t:dir add_name;
 allow init_t httpd_var_lib_t:dir add_name;
 allow init_t httpd_var_run_t:dir add_name;
+
+# Grant php-fpm the ability to write to log files.  It seems to be
+# able to actually write to the log files already; this affects only
+# the result from calling access() to check whether or not the file is
+# writable.  SuiteCRM (ab)uses this kind of check a lot.
+#
+allow httpd_t httpd_log_t:file write;
