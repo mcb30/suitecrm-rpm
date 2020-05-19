@@ -4,6 +4,26 @@
 #
 unset PHPTURD
 
+# Restore selinux file contexts on directories created by systemd
+#
+# This ought not to be necessary.  systemd's selinux-util.c installs a
+# callback that is supposed to detect an selinux policy reload.
+# However, experiments with strace show that systemd receives the
+# SELNL_MSG_POLICYLOAD but then completely ignores the updated policy.
+# Using "systemctl daemon-reexec" causes systemd to pick up the new
+# policy, but this is not something we want to do from an RPM
+# postinstall script.
+#
+# Work around the problem by using restorecon to correct the file
+# contexts on the directories that were created by systemd based on
+# potentially-outdated policy.
+#
+restorecon ${RUNTIME_DIRECTORY} \
+	   ${STATE_DIRECTORY} \
+	   ${CACHE_DIRECTORY} \
+	   ${LOGS_DIRECTORY} \
+	   ${CONFIGURATION_DIRECTORY}
+
 # Create writable directories
 #
 for rwdir in ${CACHE_DIRECTORY}/session \
