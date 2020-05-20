@@ -70,6 +70,24 @@ rm -f include/SuiteGraphs/rgraph/scripts/jsmin
 #
 rm -rf cache upload
 
+# Remove stray files that should not be in the distribution zipfile
+#
+find . -name .cvsignore -delete
+find . -name .editorconfig -delete
+find . -name .gitattributes -delete
+find . -name .github -exec rm -r \{\} \; -prune
+find . -name .gitignore -delete
+find . -name .gitkeep -delete
+find . -name .gitmodules -delete
+find . -name .htaccess -delete
+find . -name .php_cs -delete
+find . -name .php_cs.dist -delete
+find . -name .npmignore -delete
+find . -name .scenarios.lock -exec rm -r \{\} \; -prune
+find . -name .scrutinizer.yml -delete
+find . -name .styleci.yml -delete
+find . -name .travis.yml -delete
+
 # Fix file permissions
 #
 find . -type f -exec chmod a-x \{\} \;
