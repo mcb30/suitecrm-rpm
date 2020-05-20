@@ -47,6 +47,7 @@ done
 # Create writable placeholder files
 #
 for rwfile in ${STATE_DIRECTORY}/install/status.json \
+	      ${STATE_DIRECTORY}/config_override.php \
 	      ${LOGS_DIRECTORY}/error.log \
 	      ${LOGS_DIRECTORY}/install.log \
 	      ${LOGS_DIRECTORY}/php-fpm.log \
