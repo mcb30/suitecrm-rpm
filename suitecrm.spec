@@ -29,6 +29,7 @@ BuildArch:	noarch
 BuildRequires:	findutils
 BuildRequires:	sed
 BuildRequires:	systemd
+BuildRequires:	selinux-policy-devel
 Requires:	httpd-filesystem
 Requires:	nginx-filesystem
 Requires:	logrotate
