@@ -1,8 +1,30 @@
 #!/bin/sh
 
+# Fail on any error
+#
+set -e
+
 # Bypass phpturd virtual filesystem
 #
 unset PHPTURD
+
+# Set required variables on systemd-239 and older
+#
+if [ -z "${RUNTIME_DIRECTORY}" ] ; then
+    RUNTIME_DIRECTORY=/run/suitecrm/${INSTANCE}
+fi
+if [ -z "${STATE_DIRECTORY}" ] ; then
+    STATE_DIRECTORY=/var/lib/suitecrm/${INSTANCE}
+fi
+if [ -z "${CACHE_DIRECTORY}" ] ; then
+    CACHE_DIRECTORY=/var/cache/suitecrm/${INSTANCE}
+fi
+if [ -z "${LOGS_DIRECTORY}" ] ; then
+    LOGS_DIRECTORY=/var/log/suitecrm/${INSTANCE}
+fi
+if [ -z "${CONFIGURATION_DIRECTORY}" ] ; then
+    CONFIGURATION_DIRECTORY=/etc/suitecrm/${INSTANCE}
+fi
 
 # Restore selinux file contexts on directories created by systemd
 #
