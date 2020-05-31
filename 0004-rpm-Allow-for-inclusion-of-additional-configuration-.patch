@@ -1,0 +1,33 @@
+From 906609780ee9b3c81cc24bb7ae7e5c9a6f200a72 Mon Sep 17 00:00:00 2001
+From: Michael Brown <mbrown@fensystems.co.uk>
+Date: Sun, 31 May 2020 13:27:09 +0100
+Subject: [PATCH 4/4] rpm: Allow for inclusion of additional configuration
+ fragments
+
+Allow for configuration fragments placed in a conf.d directory to be
+assembled into a conf_d.php that is included after config.php and
+config_override.php.
+
+Signed-off-by: Michael Brown <mbrown@fensystems.co.uk>
+---
+ include/entryPoint.php | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/include/entryPoint.php b/include/entryPoint.php
+index 4743a96e7..141766cab 100755
+--- a/include/entryPoint.php
++++ b/include/entryPoint.php
+@@ -76,6 +76,10 @@ if (is_file('config.php')) {
+ if (is_file('config_override.php')) {
+     require_once 'config_override.php';
+ }
++// Include assembled configuration fragments from conf.d directories
++if (is_file('conf_d.php')) {
++    require_once 'conf_d.php';
++}
+ if (empty($GLOBALS['installing']) && empty($sugar_config['dbconfig']['db_name'])) {
+     header('Location: install.php');
+     exit();
+-- 
+2.25.1
+

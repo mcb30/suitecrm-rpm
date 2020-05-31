@@ -1,7 +1,7 @@
 From f54da53ee1a6ba3b68ffd3cd415b50892af7dd26 Mon Sep 17 00:00:00 2001
 From: Michael Brown <mbrown@fensystems.co.uk>
 Date: Sat, 16 May 2020 19:11:39 +0100
-Subject: [PATCH 2/3] rpm: Bypass writability checks for config.php and
+Subject: [PATCH 2/4] rpm: Bypass writability checks for config.php and
  config-override.php
 
 Force the installer to proceed despite being unable to directly write

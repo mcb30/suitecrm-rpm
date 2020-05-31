@@ -60,7 +60,8 @@ done
 
 # Create readonly directories
 #
-for rodir in ${STATE_DIRECTORY}/install ; do
+for rodir in ${STATE_DIRECTORY}/install \
+	     ${CONFIGURATION_DIRECTORY}/conf.d ; do
     mkdir -p ${rodir}
     chmod 0750 ${rodir}
     chgrp suitecrm ${rodir}
@@ -83,11 +84,19 @@ done
 # Create readonly placeholder files
 #
 for rofile in ${CONFIGURATION_DIRECTORY}/config.php \
-	      ${CONFIGURATION_DIRECTORY}/api.key ; do
+	      ${CONFIGURATION_DIRECTORY}/api.key \
+	      ${STATE_DIRECTORY}/conf_d.php ; do \
     touch ${rofile}
     chmod 0640 ${rofile}
     chgrp suitecrm ${rofile}
 done
+
+# Assemble conf_d.php
+#
+cat $(find {/etc/suitecrm,${CONFIGURATION_DIRECTORY}}/conf.d \
+	   -name '*.php' | \
+      while read phpinc ; do echo $(basename ${phpinc}) ${phpinc} ; done | \
+      sort -s | cut -d" " -f2) > ${STATE_DIRECTORY}/conf_d.php
 
 # Create API key
 #

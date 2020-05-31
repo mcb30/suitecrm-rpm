@@ -19,12 +19,14 @@ Source5:	%{name}-scheduler@.timer
 Source6:	%{name}-httpd.conf
 Source7:	%{name}-default-httpd.conf
 Source8:	%{name}-logrotate
-Source9:	README.md
-Source10:	%{name}.te
-Source11:	%{name}.fc
+Source9:	%{name}-header.php
+Source10:	README.md
+Source11:	%{name}.te
+Source12:	%{name}.fc
 Patch1:		0001-rpm-Kill-the-make_writable-function.patch
 Patch2:		0002-rpm-Bypass-writability-checks-for-config.php-and-con.patch
 Patch3:		0003-rpm-Store-OAuth2-encryption-key-in-a-data-file-rathe.patch
+Patch4:		0004-rpm-Allow-for-inclusion-of-additional-configuration-.patch
 BuildArch:	noarch
 BuildRequires:	findutils
 BuildRequires:	sed
@@ -96,13 +98,13 @@ chmod -R g-w,o-w .
 
 # Add RPM readme
 #
-cp %{SOURCE9} README-RPM.md
+cp %{SOURCE10} README-RPM.md
 
 # Build SELinux policies
 #
 mkdir selinux
-cp %{SOURCE10} selinux/%{name}.te
-cp %{SOURCE11} selinux/%{name}.fc
+cp %{SOURCE11} selinux/%{name}.te
+cp %{SOURCE12} selinux/%{name}.fc
 make -C selinux -f %{_datadir}/selinux/devel/Makefile %{name}.pp
 
 %install
@@ -131,6 +133,7 @@ install -D -m 644 %{SOURCE5} %{buildroot}%{_unitdir}/%{name}-scheduler@.timer
 install -D -m 644 %{SOURCE6} %{buildroot}%{_sysconfdir}/httpd/conf.d/50-%{name}.conf
 install -D -m 644 %{SOURCE7} %{buildroot}%{_sysconfdir}/httpd/conf.d/%{name}-default.conf
 install -D -m 644 %{SOURCE8} %{buildroot}%{_sysconfdir}/logrotate.d/%{name}
+install -D -m 644 %{SOURCE9} %{buildroot}%{_sysconfdir}/%{name}/conf.d/00-header.php
 
 # Create systemd placeholder directories
 #
@@ -193,9 +196,11 @@ install -D -m 644 selinux/%{name}.pp \
 %doc selinux/%{name}.fc
 %license LICENSE.txt
 %dir %attr(0750, root, %{name}) %{_sysconfdir}/%{name}
+%dir %attr(0750, root, %{name}) %{_sysconfdir}/%{name}/conf.d
 %dir %attr(0750, root, %{name}) %{_sharedstatedir}/%{name}
 %dir %attr(0750, root, %{name}) %{_localstatedir}/cache/%{name}
 %dir %attr(0750, root, %{name}) %{_localstatedir}/log/%{name}
+%config(noreplace) %{_sysconfdir}/%{name}/conf.d/00-header.php
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/50-%{name}.conf
 %config(noreplace) %{_sysconfdir}/httpd/conf.d/%{name}-default.conf
 %config(noreplace) %{_sysconfdir}/logrotate.d/%{name}

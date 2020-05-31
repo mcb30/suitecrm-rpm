@@ -15,7 +15,6 @@ Environment=PHPTURD=/usr/share/suitecrm/code:/var/lib/suitecrm/%i
 Environment=INSTANCE=%i
 ExecStartPre=/usr/libexec/suitecrm-setup
 ExecStart=/usr/sbin/php-fpm -F -y /run/suitecrm/%i/php-fpm.conf
-ExecReload=/bin/kill -USR2 ${MAINPID}
 
 [Install]
 WantedBy=multi-user.target
