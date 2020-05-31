@@ -6,7 +6,7 @@
 
 Name:		suitecrm
 Version:	7.11.13
-Release:	4%{?dist}
+Release:	5%{?dist}
 Summary:	SuiteCRM Customer Relationship Management
 License:	Affero GPLv3
 URL:		https://suitecrm.com/
@@ -216,6 +216,9 @@ install -D -m 644 selinux/%{name}.pp \
 %{_datadir}/selinux/packages/%{name}.pp
 
 %changelog
+* Sun May 31 2020 Michael Brown <mbrown@fensystems.co.uk> - 7.11.13-5
+- Allow for inclusion of additional configuration via conf.d
+
 * Thu May 21 2020 Michael Brown <mbrown@fensystems.co.uk> - 7.11.13-4
 - Fixes for CentOS 8
 
