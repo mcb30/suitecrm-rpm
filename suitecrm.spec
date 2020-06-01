@@ -8,7 +8,7 @@
 
 Name:		suitecrm
 Version:	7.11.13
-Release:	5%{?dist}
+Release:	6%{?dist}
 Summary:	SuiteCRM Customer Relationship Management
 License:	Affero GPLv3
 URL:		https://suitecrm.com/
@@ -222,6 +222,9 @@ rm %{_sysusersdir}/%{name}.conf
 %{_datadir}/selinux/packages/%{name}.pp
 
 %changelog
+* Mon Jun  1 2020 Michael Brown <mbrown@fensystems.co.uk> - 7.11.13-6
+- Work around systemd-sysusers bug
+
 * Sun May 31 2020 Michael Brown <mbrown@fensystems.co.uk> - 7.11.13-5
 - Allow for inclusion of additional configuration via conf.d
 
