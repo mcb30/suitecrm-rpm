@@ -1,7 +1,9 @@
 %define with_systemd_rpm_macros 1
+%define with_broken_systemd_sysusers 0
 
 %if 0%{?rhel}
 %define with_systemd_rpm_macros 0
+%define with_broken_systemd_sysusers 1
 %endif
 
 Name:		suitecrm
@@ -168,6 +170,10 @@ install -D -m 644 selinux/%{name}.pp \
 
 %pre
 %selinux_relabel_pre
+%if 0%{?with_broken_systemd_sysusers}
+# systemd-users pre-240 will segfault if asked to --replace an existent file
+rm %{_sysusersdir}/%{name}.conf
+%endif
 %sysusers_create_package %{name} %{SOURCE1}
 
 %post
