@@ -155,7 +155,7 @@ done
 
 # Mark permitted entry points
 #
-for file in index.php install.php \
+for file in index.php install.php ical_server.php vcal_server.php \
 	    service/*/rest.php service/*/soap.php \
 	    themes/SuiteP/css/colourSelector.php \
 	    include/social/get_feed_data.php ; do
