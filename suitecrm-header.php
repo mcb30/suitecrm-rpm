@@ -16,3 +16,9 @@ require_once 'config_override.php';
 if (isset($GLOBALS['installing'])) {
     require_once 'install/install_defaults.php';
 }
+
+# Inhibit log spam from the ElasticSearch code
+#
+if (empty($sugar_config['search']['ElasticSearch']['enabled'])) {
+    $sugar_config['search']['ElasticSearch']['enabled'] = false;
+}
