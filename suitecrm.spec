@@ -8,7 +8,7 @@
 
 Name:		suitecrm
 Version:	7.11.13
-Release:	6%{?dist}
+Release:	7%{?dist}
 Summary:	SuiteCRM Customer Relationship Management
 License:	Affero GPLv3
 URL:		https://suitecrm.com/
@@ -222,6 +222,9 @@ rm %{_sysusersdir}/%{name}.conf
 %{_datadir}/selinux/packages/%{name}.pp
 
 %changelog
+* Wed Jun  3 2020 Michael Brown <mbrown@fensystems.co.uk> - 7.11.13-7
+- Enable missing calendar server entry points
+
 * Mon Jun  1 2020 Michael Brown <mbrown@fensystems.co.uk> - 7.11.13-6
 - Work around systemd-sysusers bug
 
