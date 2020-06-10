@@ -8,7 +8,7 @@
 
 Name:		suitecrm
 Version:	7.11.13
-Release:	8%{?dist}
+Release:	9%{?dist}
 Summary:	SuiteCRM Customer Relationship Management
 License:	Affero GPLv3
 URL:		https://suitecrm.com/
@@ -222,6 +222,9 @@ rm %{_sysusersdir}/%{name}.conf
 %{_datadir}/selinux/packages/%{name}.pp
 
 %changelog
+* Wed Jun 10 2020 Michael Brown <mbrown@fensystems.co.uk> - 7.11.13-9
+- Work around broken relative links in CSS files
+
 * Wed Jun  3 2020 Michael Brown <mbrown@fensystems.co.uk> - 7.11.13-8
 - Inhibit ElasticSearch log spam from suitecrm-scheduler
 
