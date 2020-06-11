@@ -127,6 +127,19 @@ the SuiteCRM code does not have permission to overwrite itself.  This
 is intentional: the system package manager is authoritative and may
 not be bypassed.
 
+Security settings
+-----------------
+
+The default `selinux` security policy for Red Hat distributions is to
+prevent web applications from initiating network connections to
+external servers.  This default security policy may prevent some
+functionality (such as sending emails) from working.
+
+You can change the system security policy to allow web applications to
+initiate network connections using:
+
+    setsebool -P httpd_can_network_connect on
+
 API key
 -------
 
