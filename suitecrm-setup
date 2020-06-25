@@ -61,6 +61,7 @@ done
 # Create readonly directories
 #
 for rodir in ${STATE_DIRECTORY}/install \
+	     ${STATE_DIRECTORY}/Api/V8/OAuth2 \
 	     ${CONFIGURATION_DIRECTORY}/conf.d ; do
     mkdir -p ${rodir}
     chmod 0750 ${rodir}
@@ -71,6 +72,8 @@ done
 #
 for rwfile in ${STATE_DIRECTORY}/install/status.json \
 	      ${STATE_DIRECTORY}/config_override.php \
+	      ${CONFIGURATION_DIRECTORY}/private.key \
+	      ${CONFIGURATION_DIRECTORY}/public.key \
 	      ${LOGS_DIRECTORY}/error.log \
 	      ${LOGS_DIRECTORY}/install.log \
 	      ${LOGS_DIRECTORY}/php-fpm.log \
@@ -104,6 +107,19 @@ if [ ! -s ${CONFIGURATION_DIRECTORY}/api.key ] ; then
     head -c 32 /dev/random > ${CONFIGURATION_DIRECTORY}/api.key
 fi
 
+# Create private key
+#
+if [ ! -s ${CONFIGURATION_DIRECTORY}/private.key ] ; then
+    openssl genrsa -out ${CONFIGURATION_DIRECTORY}/private.key
+fi
+
+# Create public key
+#
+if [ ! -s ${CONFIGURATION_DIRECTORY}/public.key ] ; then
+    openssl rsa -in ${CONFIGURATION_DIRECTORY}/private.key \
+	    -pubout -out ${CONFIGURATION_DIRECTORY}/public.key
+fi
+
 # Create symlinks
 #
 ln -s -f -T ${CACHE_DIRECTORY}/cache ${STATE_DIRECTORY}/cache
@@ -111,6 +127,10 @@ ln -s -f -T ${LOGS_DIRECTORY}/install.log ${STATE_DIRECTORY}/install.log
 ln -s -f -T ${LOGS_DIRECTORY}/suitecrm.log ${STATE_DIRECTORY}/suitecrm.log
 ln -s -f -T ${CONFIGURATION_DIRECTORY}/config.php ${STATE_DIRECTORY}/config.php
 ln -s -f -T ${CONFIGURATION_DIRECTORY}/api.key ${STATE_DIRECTORY}/api.key
+ln -s -f -T ${CONFIGURATION_DIRECTORY}/private.key \
+   ${STATE_DIRECTORY}/Api/V8/OAuth2/private.key
+ln -s -f -T ${CONFIGURATION_DIRECTORY}/public.key \
+   ${STATE_DIRECTORY}/Api/V8/OAuth2/public.key
 ln -s -f -T /dev/null ${STATE_DIRECTORY}/.htaccess
 
 # Create php-fpm configuration file
