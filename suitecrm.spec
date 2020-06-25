@@ -8,7 +8,7 @@
 
 Name:		suitecrm
 Version:	7.11.13
-Release:	9%{?dist}
+Release:	10%{?dist}
 Summary:	SuiteCRM Customer Relationship Management
 License:	Affero GPLv3
 URL:		https://suitecrm.com/
@@ -222,6 +222,9 @@ rm %{_sysusersdir}/%{name}.conf
 %{_datadir}/selinux/packages/%{name}.pp
 
 %changelog
+* Thu Jun 25 2020 Michael Brown <mbrown@fensystems.co.uk> - 7.11.13-10
+- Enable use of V8 API
+
 * Wed Jun 10 2020 Michael Brown <mbrown@fensystems.co.uk> - 7.11.13-9
 - Work around broken relative links in CSS files
 
