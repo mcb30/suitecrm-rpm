@@ -221,6 +221,9 @@ rm %{_sysusersdir}/%{name}.conf
 %{_datadir}/selinux/packages/%{name}.pp
 
 %changelog
+* Mon Jun 29 2020 Michael Brown <mbrown@fensystems.co.uk> - 7.11.15-1
+- Upgrade to 7.11.15
+
 * Thu Jun 25 2020 Michael Brown <mbrown@fensystems.co.uk> - 7.11.13-10
 - Enable use of V8 API
 
