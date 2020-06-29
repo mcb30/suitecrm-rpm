@@ -22,3 +22,9 @@ if (isset($GLOBALS['installing'])) {
 if (empty($sugar_config['search']['ElasticSearch']['enabled'])) {
     $sugar_config['search']['ElasticSearch']['enabled'] = false;
 }
+
+# Load API key if not already set in config.php
+#
+if (empty($sugar_config['oauth2_encryption_key'])) {
+    $sugar_config['oauth2_encryption_key'] = file_get_contents(__DIR__.'/api.key');
+}
