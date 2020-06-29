@@ -1,7 +1,7 @@
-From 906609780ee9b3c81cc24bb7ae7e5c9a6f200a72 Mon Sep 17 00:00:00 2001
+From ed5945716ac3d28af8f206b870eccc57d4c95b21 Mon Sep 17 00:00:00 2001
 From: Michael Brown <mbrown@fensystems.co.uk>
 Date: Sun, 31 May 2020 13:27:09 +0100
-Subject: [PATCH 4/4] rpm: Allow for inclusion of additional configuration
+Subject: [PATCH 3/3] rpm: Allow for inclusion of additional configuration
  fragments
 
 Allow for configuration fragments placed in a conf.d directory to be
@@ -14,7 +14,7 @@ Signed-off-by: Michael Brown <mbrown@fensystems.co.uk>
  1 file changed, 4 insertions(+)
 
 diff --git a/include/entryPoint.php b/include/entryPoint.php
-index 4743a96e7..141766cab 100755
+index f29ec5fb1..36f77bbb5 100755
 --- a/include/entryPoint.php
 +++ b/include/entryPoint.php
 @@ -76,6 +76,10 @@ if (is_file('config.php')) {

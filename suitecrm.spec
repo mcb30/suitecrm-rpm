@@ -7,12 +7,12 @@
 %endif
 
 Name:		suitecrm
-Version:	7.11.13
-Release:	10%{?dist}
+Version:	7.11.15
+Release:	1%{?dist}
 Summary:	SuiteCRM Customer Relationship Management
 License:	Affero GPLv3
 URL:		https://suitecrm.com/
-Source0:	https://suitecrm.com/files/162/SuiteCRM-7.11/500/SuiteCRM-%{version}.zip
+Source0:	https://suitecrm.com/files/162/SuiteCRM-7.11/513/SuiteCRM-%{version}.zip
 Source1:	%{name}-sysusers.conf
 Source2:	%{name}-setup
 Source3:	%{name}@.service
@@ -27,8 +27,7 @@ Source11:	%{name}.te
 Source12:	%{name}.fc
 Patch1:		0001-rpm-Kill-the-make_writable-function.patch
 Patch2:		0002-rpm-Bypass-writability-checks-for-config.php-and-con.patch
-Patch3:		0003-rpm-Store-OAuth2-encryption-key-in-a-data-file-rathe.patch
-Patch4:		0004-rpm-Allow-for-inclusion-of-additional-configuration-.patch
+Patch4:		0003-rpm-Allow-for-inclusion-of-additional-configuration-.patch
 BuildArch:	noarch
 BuildRequires:	findutils
 BuildRequires:	sed
