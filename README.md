@@ -127,6 +127,10 @@ the SuiteCRM code does not have permission to overwrite itself.  This
 is intentional: the system package manager is authoritative and may
 not be bypassed.
 
+After upgrading the RPM package you should log in to the web UI,
+browse to `Administration` ➡ `️️System` ➡ ️`Repair` and run the `Quick
+Repair & Rebuild` process to update the database schema.
+
 Security settings
 -----------------
 
