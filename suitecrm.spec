@@ -8,7 +8,7 @@
 
 Name:		suitecrm
 Version:	7.11.15
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	SuiteCRM Customer Relationship Management
 License:	Affero GPLv3
 URL:		https://suitecrm.com/
@@ -221,6 +221,9 @@ rm %{_sysusersdir}/%{name}.conf
 %{_datadir}/selinux/packages/%{name}.pp
 
 %changelog
+* Tue Jun 30 2020 Michael Brown <mbrown@fensystems.co.uk> - 7.11.15-2
+- Document database upgrade process
+
 * Mon Jun 29 2020 Michael Brown <mbrown@fensystems.co.uk> - 7.11.15-1
 - Upgrade to 7.11.15
 
